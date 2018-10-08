@@ -117,7 +117,22 @@ class SpellChecker():
     	return 
 
     def check_text(text, fallback=False): 
-    	return 
+    	"""
+        takes a string as input, tokenize and sentence segment it with spacy, 
+        and then return the concatenation of the result of calling check_sentence 
+        on all of the resulting sentence objects.
+        """
+        nlp = English()
+        nlp.tokenizer = Tokenizer(nlp.vocab)
+        doc = nlp(text)
+        result = []
+        for sent in doc.sents:
+            correctionList = check_sentence(sent)
+            result.extend(correctionList)
+        
+        return result
+            
+
 
     def autocorrect_sentence(sentence): 
     	return 
