@@ -110,6 +110,9 @@ class SpellChecker():
                 words += set(self.inserts(word)) + set(self.deletes(word)) + set(self.substitutions(word))
     	return list(words)
 
+    def check_non_words(sentence, fallback=False):
+        return
+
     def check_sentence(sentence, fallback=False): 
     	return 
 
