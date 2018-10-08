@@ -106,12 +106,24 @@ class SpellChecker():
         words = {word}
         for i in range(self.max_distance):
             # find all words within edit distance 1 of the words currently in words
-            for word in words:
-                words += set(self.inserts(word)) + set(self.deletes(word)) + set(self.substitutions(word))
+            for candidate in words:
+                words += set(self.inserts(candidate)) + set(self.deletes(candidate)) + set(self.substitutions(candidate))
+        if word not in self.language_model: # we started with word to generate first set of candidates, but we don't want it in the final return if it isn't actually a word
+            words.remove(word)
     	return list(words)
 
     def check_non_words(sentence, fallback=False):
-        return
+        words = []
+        for i in len(sentence):
+            if sentence[i] in self.language_model:
+                words.append([sentence[i]])
+            else:
+                candidates = self.generate_candidiates(sentence[i])
+                prev_word = '<s>' if i == 0 else sentence[i - 1]
+                next_word = '</s>' if i == len(sentence) - 1 else sentence[i + 1]
+                candidates.sort(key=lambda x: (0.5*bigram_score(prev_word, x, next_word) + 0.5*unigram_score(x)) + cm_score(sentence[i], x))
+                words.append(candidates)
+        return words
 
     def check_sentence(sentence, fallback=False): 
         return self.check_non_words(sentence, fallback)
