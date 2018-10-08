@@ -170,8 +170,25 @@ class SpellChecker():
     	return newSentence
 
     def suggest_sentence(sentence, max_suggestions): 
-    	return 
+        
+        words = self.check_sentence(sentence)
+        newSentence = []
+        for i in range(len(sentence)):
+            if sentence[i] in self.language_model:
+                newSentence.append(sentence[i])
+            else:
+                newSentence.append(words[i][0:max_suggestions])
+        return newSentence
+        
 
     def suggest_text(text, max_suggestions): 
-    	return 
-    	
+        checkLines = self.check_text(line)
+        newSentence = []
+        for i in range(len(sentence)):
+            if sentence[i] in self.language_model:
+                newSentence.append(sentence[i])
+            else:
+                newSentence.append(words[i][0:max_suggestions])
+        return newSentence
+        
+        
