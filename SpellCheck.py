@@ -98,7 +98,6 @@ class SpellChecker():
         
         return subList
  
-
     def generate_candidates(word):
         """
         returns a list of words within max_distance edits of the given word
@@ -122,12 +121,13 @@ class SpellChecker():
                 prev_word = '<s>' if i == 0 else sentence[i - 1]
                 next_word = '</s>' if i == len(sentence) - 1 else sentence[i + 1]
                 candidates.sort(key=lambda x: (0.5*bigram_score(prev_word, x, next_word) + 0.5*unigram_score(x)) + cm_score(sentence[i], x))
+                if fallback and not candidiates:
+                    candidates = sentence[i]
                 words.append(candidates)
         return words
 
     def check_sentence(sentence, fallback=False): 
         return self.check_non_words(sentence, fallback)
-
 
     def check_text(text, fallback=False): 
     	"""
@@ -141,10 +141,7 @@ class SpellChecker():
         for sent in doc.sents:
             correctionList = self.check_sentence(sent)
             result.extend(correctionList)
-        
         return result
-            
-
 
     def autocorrect_sentence(sentence):
         """Take a tokenized sentence (as a list of words) as input, 
@@ -179,7 +176,6 @@ class SpellChecker():
             else:
                 newSentence.append(words[i][0:max_suggestions])
         return newSentence
-        
 
     def suggest_text(text, max_suggestions): 
         checkLines = self.check_text(line, True)
