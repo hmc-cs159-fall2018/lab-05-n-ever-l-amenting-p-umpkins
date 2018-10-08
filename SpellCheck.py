@@ -4,7 +4,7 @@ import spacy
 
 class SpellChecker():
     def __init__(self, channel_model=None, language_model=None, max_distance=100): 
-        # self.nlp = spacy.load("en", pipeline=["tagger", "parser"])
+        self.nlp = spacy.load("en", pipeline=["tagger", "parser"])
         self.channel_model = channel_model 
         self.language_model = language_model 
         self.max_distance = max_distance
@@ -114,7 +114,8 @@ class SpellChecker():
         return
 
     def check_sentence(sentence, fallback=False): 
-    	return 
+        return self.check_non_words(sentence, fallback)
+
 
     def check_text(text, fallback=False): 
     	"""
@@ -122,23 +123,39 @@ class SpellChecker():
         and then return the concatenation of the result of calling check_sentence 
         on all of the resulting sentence objects.
         """
-        nlp = English()
-        nlp.tokenizer = Tokenizer(nlp.vocab)
-        doc = nlp(text)
+        self.nlp.tokenizer = Tokenizer(nlp.vocab)
+        doc = self.nlp(text)
         result = []
         for sent in doc.sents:
-            correctionList = check_sentence(sent)
+            correctionList = self.check_sentence(sent)
             result.extend(correctionList)
         
         return result
             
 
 
-    def autocorrect_sentence(sentence): 
-    	return 
+    def autocorrect_sentence(sentence):
+        """Take a tokenized sentence (as a list of words) as input, 
+        call check_sentence on the sentence with fallback=True, and 
+        return a new list of tokens where each non-word has been
+         replaced by its most likely spelling correction
+        """ 
+        words = self.check_sentence(sentence)
+        newSentence = []
+        for i in range(len(sentence)):
+            newSentence.append(words[i][0])
+        return newSentence
 
     def autocorrect_line(line):
-    	return 
+        """Take a string as input, tokenize and segment it with spacy, 
+        and then return the concatenation of the result
+        of calling autocorrect_sentence on all of the resulting sentence objects.
+        """
+        checkLines = self.check_text(line)
+        newSentence = []
+        for i in range(len(checkLines)):
+            newSentence.append(checkLines[i][0])
+    	return newSentence
 
     def suggest_sentence(sentence, max_suggestions): 
     	return 
