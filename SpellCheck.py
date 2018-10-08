@@ -152,7 +152,7 @@ class SpellChecker():
         return a new list of tokens where each non-word has been
          replaced by its most likely spelling correction
         """ 
-        words = self.check_sentence(sentence)
+        words = self.check_sentence(sentence, True)
         newSentence = []
         for i in range(len(sentence)):
             newSentence.append(words[i][0])
@@ -163,7 +163,7 @@ class SpellChecker():
         and then return the concatenation of the result
         of calling autocorrect_sentence on all of the resulting sentence objects.
         """
-        checkLines = self.check_text(line)
+        checkLines = self.check_text(line, True)
         newSentence = []
         for i in range(len(checkLines)):
             newSentence.append(checkLines[i][0])
@@ -171,7 +171,7 @@ class SpellChecker():
 
     def suggest_sentence(sentence, max_suggestions): 
         
-        words = self.check_sentence(sentence)
+        words = self.check_sentence(sentence, True)
         newSentence = []
         for i in range(len(sentence)):
             if sentence[i] in self.language_model:
@@ -182,7 +182,7 @@ class SpellChecker():
         
 
     def suggest_text(text, max_suggestions): 
-        checkLines = self.check_text(line)
+        checkLines = self.check_text(line, True)
         newSentence = []
         for i in range(len(sentence)):
             if sentence[i] in self.language_model:
