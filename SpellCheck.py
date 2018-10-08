@@ -1,6 +1,6 @@
-# from EditDistance import EditDistanceFinder
-# from LanguageModel import LanguageModel 
-# import spacy 
+from EditDistance import EditDistanceFinder
+from LanguageModel import LanguageModel 
+import spacy 
 
 class SpellChecker():
     def __init__(self, channel_model=None, language_model=None, max_distance=100): 
@@ -78,8 +78,26 @@ class SpellChecker():
                     wordLen.append(v) 
         return v        
 
-    def substitutions(self, word):
-    	return 
+    def substitutions(word):
+        """
+        take a word as input and return a list of words (that are in the LanguageModel) that are 
+        within one substitution of word.
+        """
+        subList = []
+        wordLen = len(word)
+
+    	for candidate in self.language_model:
+            if len(candidate) == wordLen:
+                for i in range(wordLen):
+                    candidateDel = candidate[:i] + candidate[i+1:]
+                    wordDel = word[:i] + word[i+1:]
+                    if candidateDel == wordDel:
+                        if candidate not in subList:
+                            subList.append(candidate)
+                        break
+        
+        return subList
+ 
 
     def generate_candidates(word):
     	return
