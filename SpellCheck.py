@@ -52,7 +52,7 @@ class SpellChecker():
         vocab = self.language_model.vocabulary
         for v in vocab: 
             if len(v) == wordLen + 1:
-                if subseq(word, v):
+                if self.subseq(word, v):
                     wordLen.append(v) 
         return v
 
@@ -74,7 +74,7 @@ class SpellChecker():
         vocab = self.language_model.vocabulary
         for v in vocab: 
             if len(v) +1 == wordLen:
-                if subseq(v, word):
+                if self.subseq(v, word):
                     wordLen.append(v) 
         return v        
 
