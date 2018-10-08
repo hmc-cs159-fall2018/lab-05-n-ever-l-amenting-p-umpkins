@@ -68,9 +68,7 @@ class SpellChecker():
                     if candidateDel == wordDel:
                         if candidate not in subList:
                             subList.append(candidate)
-                            break
-                        else:
-                            break
+                        break
         
         return subList
 
