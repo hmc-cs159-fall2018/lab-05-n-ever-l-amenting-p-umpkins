@@ -116,9 +116,6 @@ class SpellChecker():
     def check_sentence(sentence, fallback=False): 
     	return 
 
-    def check_sentence(sentence, fallback=False): 
-    	return 
-
     def check_text(text, fallback=False): 
     	return 
 
