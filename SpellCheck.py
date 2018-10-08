@@ -53,7 +53,27 @@ class SpellChecker():
     	return 
 
     def substitutions(word):
-    	return 
+        """
+        take a word as input and return a list of words (that are in the LanguageModel) that are 
+        within one substitution of word.
+        """
+        subList = []
+        wordLen = len(word)
+
+    	for candidate in self.language_model:
+            if len(candidate) == wordLen:
+                for i in range(wordLen):
+                    candidateDel = candidate[:i] + candidate[i+1:]
+                    wordDel = word[:i] + word[i+1:]
+                    if candidateDel == wordDel:
+                        if candidate not in subList:
+                            subList.append(candidate)
+                            break
+                        else:
+                            break
+        
+        return subList
+
 
     def generate_candidates(word):
     	return
