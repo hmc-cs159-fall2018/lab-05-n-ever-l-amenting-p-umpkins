@@ -100,7 +100,15 @@ class SpellChecker():
  
 
     def generate_candidates(word):
-    	return
+        """
+        returns a list of words within max_distance edits of the given word
+        """
+        words = {word}
+        for i in range(self.max_distance):
+            # find all words within edit distance 1 of the words currently in words
+            for word in words:
+                words += set(self.inserts(word)) + set(self.deletes(word)) + set(self.substitutions(word))
+    	return list(words)
 
     def check_sentence(sentence, fallback=False): 
     	return 
