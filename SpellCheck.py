@@ -1,14 +1,24 @@
-
+from EditDistance import EditDistanceFinder
+from LanguageModel import LanguageModel 
+import spacy 
 
 class SpellChecker():
-    def __init__(channel_model=None, language_model=None, max_distance): 
-    	return 
+    def __init__(channel_model=None, language_model=None, max_distance=100): 
+        self.nlp = spacy.load("en", pipeline=["tagger", "parser"])
+        self.channel_model = channel_model 
+        self.language_model = language_model 
+        self.max_distance = max_distance
+        
 
     def load_channel_model(fp): 
-    	return 
+        self.channel_model = EditDistanceFinder()
+        self.channel_model.load(fp)
+        
 
     def load_language_model(fp): 
-
+        self.language_model = LanguageModel()
+        self.language_model.load(fp)
+        
     def bigram_score(prev_word, focus_word, next_word): 
         """
         takes 3 words and returns the average bigram probability of the first and last pair
