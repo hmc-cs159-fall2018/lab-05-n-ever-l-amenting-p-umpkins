@@ -96,7 +96,27 @@ class SpellChecker():
                         break
         
         return subList
- 
+    
+    def transpositions(self, word):
+        """
+        take a word as input and return a list of words in LanguageModel that 
+        are within one substitution of the word.
+        """
+        wordsFound = []
+        wordLen = len(word)
+        for v in self.language_model.vocabulary:
+            if v.isalpha() and len(v) == wordLen:
+                transps = 0
+                for i in range(wordLen-1):
+                    if (word[i] == v[i+1] or word[i+1] == v[i]) and (word[i] != word[i+1]):
+                        transps += 1
+                    if transps >= 2:
+                        break
+                if transps == 1:
+                    wordsFound.append(v)  
+        return wordsFound 
+
+
     def generate_candidates(self, word):
         """
         returns a list of words within max_distance edits of the given word
