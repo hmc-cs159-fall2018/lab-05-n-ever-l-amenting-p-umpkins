@@ -108,7 +108,7 @@ class SpellChecker():
             if v.isalpha() and len(v) == wordLen:
                 transps = 0
                 for i in range(wordLen-1):
-                    if (word[i] == v[i+1] or word[i+1] == v[i]) and (word[i] != word[i+1]):
+                    if (word[i] == v[i+1] and word[i+1] == v[i]) and (word[i] != word[i+1]):
                         transps += 1
                     if transps >= 2:
                         break
