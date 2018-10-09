@@ -104,16 +104,10 @@ class SpellChecker():
         """
         wordsFound = []
         wordLen = len(word)
-        for v in self.language_model.vocabulary:
-            if v.isalpha() and len(v) == wordLen:
-                transps = 0
-                for i in range(wordLen-1):
-                    if (word[i] == v[i+1] and word[i+1] == v[i]) and (word[i] != word[i+1]):
-                        transps += 1
-                    if transps >= 2:
-                        break
-                if transps == 1:
-                    wordsFound.append(v)  
+        for i in range(wordLen-2):
+            transp = word[0:i] + word[i+1] + word[i] + word[i+2:]
+            if transp in self.language_model:
+                wordsFound.append(v)  
         return wordsFound 
 
 
