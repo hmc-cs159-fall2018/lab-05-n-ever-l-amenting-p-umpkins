@@ -26,4 +26,5 @@ We specify how many bytes we want to read in for a single chunk, and while a chu
 
 7. Describe the command-line interface for LanguageModel.py. What command should you run to generate a model from /data/gutenberg/*.txt and save it to lm.pkl if you want an alpha value of 0.1 and a vocabulary size of 40000?
 
-```python3 LanguageModel.py '/data/gutenberg/*.txt' --store 'lm.pkl' --alpha 0.1 --vocab 40000```
+```python3 LanguageModel.py  --store 'lm.pkl' --alpha 0.1 --vocab 40000 /data/gutenberg/*.txt```
+

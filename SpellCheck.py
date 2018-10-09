@@ -1,6 +1,7 @@
 from EditDistance import EditDistanceFinder
 from LanguageModel import LanguageModel 
 import spacy 
+from spacy.tokenizer import Tokenizer
 
 class SpellChecker():
     def __init__(self, channel_model=None, language_model=None, max_distance=100): 
@@ -49,12 +50,11 @@ class SpellChecker():
     def inserts(self, word):
         wordsFound = []
         wordLen = len(word)
-        vocab = self.language_model.vocabulary
-        for v in vocab: 
-            if len(v) == wordLen + 1:
+        for v in self.language_model.vocabulary: 
+            if v.isalpha() and len(v) == (wordLen + 1):
                 if self.subseq(word, v):
-                    wordLen.append(v) 
-        return v
+                    wordsFound.append(v)
+        return wordsFound
 
     def subseq(self, word1, word2):
         """
@@ -71,14 +71,13 @@ class SpellChecker():
     def deletes(self, word):
         wordsFound = []
         wordLen = len(word)
-        vocab = self.language_model.vocabulary
-        for v in vocab: 
-            if len(v) +1 == wordLen:
+        for v in self.language_model.vocabulary:
+            if v.isalpha() and len(v) == (wordLen - 1):
                 if self.subseq(v, word):
-                    wordLen.append(v) 
-        return v        
+                    wordsFound.append(v) 
+        return wordsFound      
 
-    def substitutions(word):
+    def substitutions(self, word):
         """
         take a word as input and return a list of words (that are in the LanguageModel) that are 
         within one substitution of word.
@@ -86,8 +85,8 @@ class SpellChecker():
         subList = []
         wordLen = len(word)
 
-    	for candidate in self.language_model:
-            if len(candidate) == wordLen:
+        for candidate in self.language_model.vocabulary:
+            if candidate.isalpha() and len(candidate) == wordLen:
                 for i in range(wordLen):
                     candidateDel = candidate[:i] + candidate[i+1:]
                     wordDel = word[:i] + word[i+1:]
@@ -98,52 +97,54 @@ class SpellChecker():
         
         return subList
  
-    def generate_candidates(word):
+    def generate_candidates(self, word):
         """
         returns a list of words within max_distance edits of the given word
         """
         words = {word}
         for i in range(self.max_distance):
             # find all words within edit distance 1 of the words currently in words
+            new_words = set()
             for candidate in words:
-                words += set(self.inserts(candidate)) + set(self.deletes(candidate)) + set(self.substitutions(candidate))
+                new_words |= set(self.inserts(candidate)) | set(self.deletes(candidate)) | set(self.substitutions(candidate))
+            words |= new_words
         if word not in self.language_model: # we started with word to generate first set of candidates, but we don't want it in the final return if it isn't actually a word
             words.remove(word)
-    	return list(words)
+        return list(words)
 
-    def check_non_words(sentence, fallback=False):
+    def check_non_words(self, sentence, fallback=False):
         words = []
-        for i in len(sentence):
+        for i in range(len(sentence)):
             if sentence[i] in self.language_model:
                 words.append([sentence[i]])
             else:
-                candidates = self.generate_candidiates(sentence[i])
+                candidates = self.generate_candidates(sentence[i])
                 prev_word = '<s>' if i == 0 else sentence[i - 1]
                 next_word = '</s>' if i == len(sentence) - 1 else sentence[i + 1]
-                candidates.sort(key=lambda x: 0.25*(0.5*bigram_score(prev_word, x, next_word) + 0.5*unigram_score(x)) + 0.75*cm_score(sentence[i], x))
-                if fallback and not candidiates:
+                candidates.sort(key=lambda x: 0.25*(0.5*bigram_score(prev_word, x, next_word) + 0.5*unigram_score(x)) + 0.75*cm_score(sentence[i], x), reverse=True)
+                if fallback and not candidates:
                     candidates = sentence[i]
                 words.append(candidates)
         return words
 
-    def check_sentence(sentence, fallback=False): 
-        return self.check_non_words(sentence, fallback)
+    def check_sentence(self, sentence, fallback=False):
+        return self.check_non_words([''.join([char for char in token.text if char.isalpha()]) for token in sentence], fallback)
 
-    def check_text(text, fallback=False): 
-    	"""
+    def check_text(self, text, fallback=False): 
+        """
         takes a string as input, tokenize and sentence segment it with spacy, 
         and then return the concatenation of the result of calling check_sentence 
         on all of the resulting sentence objects.
         """
-        self.nlp.tokenizer = Tokenizer(nlp.vocab)
-        doc = self.nlp(text)
+        self.nlp.tokenizer = Tokenizer(self.nlp.vocab)
+        doc = self.nlp(text.lower())
         result = []
         for sent in doc.sents:
-            correctionList = self.check_sentence(sent)
+            correctionList = self.check_sentence(sent, fallback)
             result.extend(correctionList)
         return result
 
-    def autocorrect_sentence(sentence):
+    def autocorrect_sentence(self, sentence):
         """Take a tokenized sentence (as a list of words) as input, 
         call check_sentence on the sentence with fallback=True, and 
         return a new list of tokens where each non-word has been
@@ -155,7 +156,9 @@ class SpellChecker():
             newSentence.append(words[i][0])
         return newSentence
 
-    def autocorrect_line(line):
+
+
+    def autocorrect_line(self, line):
         """Take a string as input, tokenize and segment it with spacy, 
         and then return the concatenation of the result
         of calling autocorrect_sentence on all of the resulting sentence objects.
@@ -164,27 +167,36 @@ class SpellChecker():
         newSentence = []
         for i in range(len(checkLines)):
             newSentence.append(checkLines[i][0])
-    	return newSentence
+        return ' '.join(newSentence)
 
-    def suggest_sentence(sentence, max_suggestions): 
+    def suggest_sentence(self, sentence, max_suggestions): 
         
         words = self.check_sentence(sentence, True)
         newSentence = []
         for i in range(len(sentence)):
-            if sentence[i] in self.language_model:
-                newSentence.append(sentence[i])
+            if sentence[i].text in self.language_model:                
+                newSentence.append(sentence[i].text)
             else:
                 newSentence.append(words[i][0:max_suggestions])
         return newSentence
 
-    def suggest_text(text, max_suggestions): 
-        checkLines = self.check_text(line, True)
-        newSentence = []
-        for i in range(len(sentence)):
-            if sentence[i] in self.language_model:
-                newSentence.append(sentence[i])
-            else:
-                newSentence.append(words[i][0:max_suggestions])
-        return newSentence
-        
+    def suggest_text(self, text, max_suggestions): 
+        # checkLines = self.check_text(text, True)
+        # newSentence = []
+        # for i in range(len(checkLines)):
+        #     if checkLines[i] in self.language_model:
+        #         newSentence.append(checkLines[i])
+        #     else:
+        #         newSentence.append(checkLines[i][0:max_suggestions])
+        # return newSentence
+        self.nlp.tokenizer = Tokenizer(self.nlp.vocab)
+        doc = self.nlp(text.lower())
+        result = []
+        for sent in doc.sents:
+            # if sent.text in self.language_model:
+            #     result.extend(sent.text) 
+            # else:
+            correctionList = self.suggest_sentence(sent, max_suggestions)
+            result.extend(correctionList)
+        return result
         
