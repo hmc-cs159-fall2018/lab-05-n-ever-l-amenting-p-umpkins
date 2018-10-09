@@ -106,7 +106,7 @@ class SpellChecker():
             # find all words within edit distance 1 of the words currently in words
             new_words = set()
             for candidate in words:
-                new_words |= set(self.inserts(candidate)) | set(self.deletes(candidate)) | set(self.substitutions(candidate))
+                new_words |= set(self.inserts(candidate)) | set(self.deletes(candidate)) | set(self.substitutions(candidate)) | set(self.transpositions(candidate))
             words |= new_words
         if word not in self.language_model: # we started with word to generate first set of candidates, but we don't want it in the final return if it isn't actually a word
             words.remove(word)
