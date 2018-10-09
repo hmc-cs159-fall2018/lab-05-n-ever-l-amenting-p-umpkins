@@ -121,13 +121,8 @@ class SpellChecker():
                 candidates = self.generate_candidates(sentence[i])
                 prev_word = '<s>' if i == 0 else sentence[i - 1]
                 next_word = '</s>' if i == len(sentence) - 1 else sentence[i + 1]
-<<<<<<< Updated upstream
-                candidates.sort(key=lambda x: 0.25*(0.5*bigram_score(prev_word, x, next_word) + 0.5*unigram_score(x)) + 0.75*cm_score(sentence[i], x), reverse=True)
-                if fallback and not candidates:
-=======
                 candidates.sort(key=lambda x: 0.25*(0.5*self.bigram_score(prev_word, x, next_word) + 0.5*self.unigram_score(x)) + 0.75*self.cm_score(sentence[i], x))
                 if fallback and not candidiates:
->>>>>>> Stashed changes
                     candidates = sentence[i]
                 words.append(candidates)
         return words
