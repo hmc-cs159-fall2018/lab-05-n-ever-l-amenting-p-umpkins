@@ -1,6 +1,7 @@
 from EditDistance import EditDistanceFinder
 from LanguageModel import LanguageModel 
 import spacy 
+import string
 from spacy.tokenizer import Tokenizer
 
 class SpellChecker():
@@ -107,7 +108,7 @@ class SpellChecker():
         for i in range(wordLen-2):
             transp = word[0:i] + word[i+1] + word[i] + word[i+2:]
             if transp in self.language_model:
-                wordsFound.append(v)  
+                wordsFound.append(transp)  
         return wordsFound 
 
 
@@ -137,12 +138,14 @@ class SpellChecker():
                 next_word = '</s>' if i == len(sentence) - 1 else sentence[i + 1]
                 candidates.sort(key=lambda x: 0.7*(0.7*self.bigram_score(prev_word, x, next_word) + 0.3*self.unigram_score(x)) + 0.3*self.cm_score(sentence[i], x), reverse=True)
                 if fallback and not candidates:
-                    candidates = sentence[i]
+                    candidates = [sentence[i]]
                 words.append(candidates)
         return words
 
     def check_sentence(self, sentence, fallback=False):
-        return self.check_non_words([''.join([char for char in token.text if char.isalpha()]) for token in sentence], fallback)
+        sentList = [''.join([char for char in token.text if char in string.ascii_lowercase]) for token in sentence]
+        sentList = [token for token in sentList if token]
+        return self.check_non_words(sentList, fallback)
 
     def check_text(self, text, fallback=False): 
         """

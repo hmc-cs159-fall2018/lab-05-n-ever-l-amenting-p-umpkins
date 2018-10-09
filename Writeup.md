@@ -28,3 +28,29 @@ We specify how many bytes we want to read in for a single chunk, and while a chu
 
 ```python3 LanguageModel.py  --store 'lm.pkl' --alpha 0.1 --vocab 40000 /data/gutenberg/*.txt```
 
+6. How often did your spell checker do a better job of correcting than ispell? Conversely, how often did ispell do a better job than your spell checker?
+
+ispell did a much better job than our spell checker. 
+
+7. Can you characterize the type of errors your spell checker tended to best at, and the type of errors ispell tended to do best at?
+
+ispell was able to keep capitalization and punctuation, which our spell checker didn't do. With more time and effort (but we've spent hours on this already) we could probably check for this.  
+
+8. Comment on anything else you notice that is interesting about spell checking – either for your model or for ispell.
+
+Our spell checker didn't know the word edit. It would replace it with "exit" or "edict". It also didn't know the word "banned" and replaced it with banner. We think these words, "edit" and "banned", are less likely to be in these old texts we trained our language model on. 
+
+We also noticed that using bigrams may not always work. For example, we kept getting "be" and "men" instead of "by" and "means" as our top choices. This is likely because "not be" and "any men" are very likely to occur. Perhaps trigrams would fix this, but would be much more computationally expensive. 
+
+
+9. Describe your approach
+
+We had a function similar to insert, delete and substitution that checked if a word was one transposition away from any word in the vocabulary, by iterating through the string, switching letters, and seeing if that new word was in the vocabulary. 
+
+10. Give examples of how your approach works, including specific sentences where your new model gives a different (hopefully better!) result than the baseline model.
+
+We didn't find any actual changes unfortunately. 
+
+11. Discuss any challenges you ran into, design decisions you made, etc.
+
+We kept the design similar to inserting, deleting and substituting. 
